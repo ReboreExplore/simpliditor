@@ -1,39 +1,50 @@
 import tkinter as tk
+from tkinter import ttk
 from tkinter.filedialog import askopenfilename, asksaveasfilename
+ 
 
-   
-def Setup():
-    window = tk.Tk() # create a window
-    window.title("myneweditor")
-
-    window.rowconfigure(0,minsize=900,weight=1)
-    window.columnconfigure(1, minsize=900,weight=1)
-
-    txt_edit = tk.Text(window)
-    fr_buttons = tk.Frame(window,relief=tk.RAISED, bd=2)
-
-    f1 = File_Ops(txt_edit,window)
-    functions = [f1.open_file,f1.new_file,f1.save_file] # add the new functionalities
-    features = ['Open','New','Save As']
-    c1 = Container_Config(fr_buttons,txt_edit)
-    c1.config_window()
-    for i,btn in enumerate(features):
-        c1.button_config(btn,functions[i],i)
+def create_frame_config(window):
+    file_buttons = ttk.Frame(window)
+    edit_buttons = ttk.Frame(window)
+    txt_editor = tk.Text(window)
     
-    window.mainloop()
+    idx_file = [1,0]
+    text_config(txt_editor)
+    
+    #  Get the file functionalities
+    f1 = File_Ops(txt_editor,window)
+    functions = [f1.open_file,f1.new_file,f1.save_file]
+    features = ['Open','New','Save As']
 
-class Container_Config:
-    def __init__(self,fr_buttons,txt_edit):
-        self.fr_buttons = fr_buttons
-        self.txt_edit = txt_edit
+    # Configure the buttons
+    c1=Button_Config(file_buttons)
+    c1.config_window(idx_file)
+    for i,btn in enumerate(features):
+        c1.button_config(btn,functions[i],i,0) # row change and column 0
 
-    def button_config(self,box_text,function,i):
-        btn = tk.Button(self.fr_buttons,text = box_text,command = function)
-        btn.grid(row = i,column=0, sticky="ew", padx=5, pady=5)
+    idx_edit = [0,1]
+    # Get the functionalities
+    edits = ['Copy','Paste','Cut']
 
-    def config_window(self):
-        self.fr_buttons.grid(row=0, column=0, sticky="ns") # ns is for letting this container expand vertically
-        self.txt_edit.grid(row=0, column=1, sticky="nsew") # nsew is to allow this grid cell to expand in all direction
+    # Configure the buttons
+    c2 = Button_Config(edit_buttons)
+    c2.config_window(idx_edit)
+    for i,btn in enumerate(edits):
+        c2.button_config(btn,edits[i],0,i) # row change and column 0
+
+def text_config(txt_editor):
+    txt_editor.grid(row=1, column=1, sticky="nsew")
+
+class Button_Config:
+    def __init__(self,buttons):
+        self.buttons = buttons
+
+    def button_config(self,box_text,function,i,j):
+        btn = tk.Button(self.buttons,text = box_text,command = function)
+        btn.grid(row = i,column=j, sticky="ew", padx=5, pady=5)
+
+    def config_window(self,idx):
+        self.buttons.grid(row=idx[0], column=idx[1], sticky="ns") # ns is for letting this container expand vertically
 
 class File_Ops:
     def __init__(self,txt_edit,window):
@@ -55,7 +66,7 @@ class File_Ops:
         """ Create a new file """
         global file_name
         file_name = 'untitled.txt'
-        self.txt_edit.delete('1.0',tk.END)
+        self.txt_edit.delete('1.0',tk.END) #'1.0' means line 1 character 0
         self.window.title(file_name)
 
     def save_file(self):
@@ -68,9 +79,29 @@ class File_Ops:
             output_file.write(text)
         self.window.title(f"myneweditor - {filepath}")
 
+class App_setup(tk.Tk):
+    def __init__(self):
+        super().__init__()
+        self.title("Simpliditor") # add a title to the window
+        self.geometry('1000x1000+50+50') # set the window size
+        self.attributes('-alpha',0.3) # make transparent window
+        self.resizable(0, 0)
+        #self.iconbitmap('./assets/simpliditor_icon.ico') # set custom icon
+
+        self.rowconfigure(0,weight=1)
+        self.rowconfigure(1,weight=12)
+        self.columnconfigure(0,weight=1)
+        self.columnconfigure(1,weight=12)
+
+        self.__create_widgets()
+    
+    def __create_widgets(self):
+        frame = create_frame_config(self) # calls the mainloop method of the tk.Tk class which freezes the program until close it
+
 
 if __name__=='__main__':
-    Setup()
+    text_app = App_setup()
+    text_app.mainloop()
     
 
 
