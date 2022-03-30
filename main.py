@@ -1,13 +1,50 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter.filedialog import askopenfilename, asksaveasfilename
- 
+from tkinter import font
 
 def create_frame_config(window):
+    # create menu
+    my_menu = tk.Menu(window)
+    window.config(menu=my_menu)
+    # File Menu
+    file_menu = tk.Menu(my_menu,tearoff = False)
+    my_menu.add_cascade(label="File", menu = file_menu)
+    file_menu.add_command(label="New")
+    file_menu.add_command(label="Open")
+    file_menu.add_command(label="Save")
+    file_menu.add_command(label="Save As")
+    file_menu.add_separator()
+    file_menu.add_command(label="Exit",command=window.quit)
+    # Edit Menu
+    edit_menu = tk.Menu(my_menu,tearoff = False)
+    my_menu.add_cascade(label="Edit", menu = edit_menu)
+    edit_menu.add_command(label="Cut")
+    edit_menu.add_command(label="Copy")
+    edit_menu.add_command(label="Paste")
+    edit_menu.add_command(label="Undo")
+    edit_menu.add_command(label="Redo")
+
+
+
     file_buttons = ttk.Frame(window)
     edit_buttons = ttk.Frame(window)
-    txt_editor = tk.Text(window)
-    
+
+    txt_editor = tk.Text(window,font=("Helvetica",16),selectbackground="grey", selectforeground="black",undo = True)
+
+    file_buttons.grid(column=0,row=1)
+    edit_buttons.grid(column=1,row=0)
+    txt_editor.grid(column=1,row=1)
+
+    # Attach scrollbar
+
+    # ys = ttk.Scrollbar(window, orient = 'vertical', command = txt_editor.yview)
+    # xs = ttk.Scrollbar(window, orient = 'horizontal', command = txt_editor.xview)
+    # txt_editor['yscrollcommand'] = ys.set
+    # txt_editor['xscrollcommand'] = xs.set
+    # xs.grid(column = 1, row = 1)
+    # ys.grid(column = 1, row = 1, sticky = 'ns')
+
     idx_file = [1,0]
     text_config(txt_editor)
     
@@ -79,6 +116,9 @@ class File_Ops:
             output_file.write(text)
         self.window.title(f"myneweditor - {filepath}")
 
+# class Edit_Ops:
+
+
 class App_setup(tk.Tk):
     def __init__(self):
         super().__init__()
@@ -103,6 +143,4 @@ if __name__=='__main__':
     text_app = App_setup()
     text_app.mainloop()
     
-
-
 
